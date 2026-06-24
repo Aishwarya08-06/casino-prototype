@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casino 2.0 — Add Games Prototype</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: #F4F4F4; color: #08080A; font-size: 14px; min-height: 100vh; }
+
+        /* === HEADER === */
+        .header { height: 60px; background: #632792; display: flex; align-items: center; padding: 0 40px; position: sticky; top: 0; z-index: 100; }
+        .header-logo { display: flex; align-items: center; gap: 8px; }
+        .header-logo .icon { width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .header-logo .text { color: #F7F6F9; }
+        .header-logo .text .title { font-size: 14px; font-weight: 700; line-height: 16px; }
+        .header-logo .text .sub { font-size: 12px; font-weight: 300; color: #E0DFE2; line-height: 16px; }
+        .header-nav { display: flex; margin-left: 200px; height: 100%; }
+        .header-nav a { padding: 0 24px; display: flex; align-items: center; color: #F4F4F4; text-decoration: none; font-size: 14px; height: 100%; }
+        .header-nav a.active { background: #4B057A; font-weight: 700; }
+        .header-nav a:hover:not(.active) { background: rgba(255,255,255,0.05); }
+        .header-right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+        .header-right .bell { width: 24px; height: 24px; opacity: 0.8; cursor: pointer; font-size: 18px; color: #fff; }
+        .header-right .avatar { width: 34px; height: 34px; border-radius: 50%; background: #E2B6FF; border: 1px solid #E2B6FF; }
+
+        /* === SUB HEADER === */
+        .sub-header { height: 60px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; align-items: center; padding: 0 40px; gap: 16px; }
+        .sub-header .back-btn { display: flex; align-items: center; gap: 8px; cursor: pointer; color: #524F5E; font-weight: 600; font-size: 14px; border: none; background: none; }
+        .sub-header .back-btn:hover { color: #632792; }
+        .sub-header .page-title { font-size: 16px; font-weight: 700; color: #262327; }
+        .sub-header .breadcrumb { font-size: 14px; color: #524F5E; margin-left: auto; }
+
+        /* === CONTENT === */
+        .content { padding: 20px 40px 60px; max-width: 1440px; margin: 0 auto; }
+        .page-desc { font-size: 14px; color: #524F5E; margin-bottom: 24px; }
+
+        /* === STEPPER === */
+        .stepper { display: flex; margin-bottom: 32px; border: 1px solid #E0DFE2; border-radius: 8px; background: #fff; overflow: hidden; }
+        .step { flex: 1; padding: 12px 16px; position: relative; }
+        .step-bar { height: 6px; border-radius: 10px; margin-bottom: 8px; background: #ECEAEE; }
+        .step.completed .step-bar { background: #963BDE; }
+        .step.active .step-bar { background: #963BDE; }
+        .step-label { font-size: 12px; color: #524F5E; display: flex; align-items: center; gap: 4px; }
+        .step.active .step-label { font-weight: 600; color: #08080A; }
+        .step.completed .step-label { font-weight: 600; color: #08080A; }
+        .step-number { width: 18px; height: 18px; border-radius: 50%; background: #963BDE; color: #fff; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+        .step:not(.active):not(.completed) .step-number { background: #E0DFE2; color: #524F5E; }
+
+        /* === STEP HEADER === */
+        .step-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
+        .step-header-left { display: flex; align-items: flex-start; gap: 12px; }
+        .step-back-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid #E0DFE2; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; margin-top: 2px; }
+        .step-back-btn:hover { background: #F7F6F9; }
+        .step-header-left h2 { font-size: 16px; font-weight: 700; }
+        .step-header-left p { font-size: 12px; color: #524F5E; margin-top: 2px; }
+        .step-header-right { display: flex; gap: 8px; }
+
+        /* === BUTTONS === */
+        .btn { padding: 8px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; font-family: 'Poppins', sans-serif; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-primary { background: #963BDE; color: #fff; }
+        .btn-primary:hover { background: #7B2ABF; }
+        .btn-primary.disabled { background: #D4C4E3; color: #9997A0; cursor: not-allowed; pointer-events: none; }
+        .btn-secondary { background: #fff; border: 1px solid #9997A0; color: #524F5E; }
+        .btn-secondary:hover { border-color: #632792; color: #632792; }
+        .btn-danger { background: #963BDE; color: #fff; }
+        .btn-outline-purple { background: #fff; border: 1px solid #963BDE; color: #632792; }
+        .btn-sm { padding: 4px 12px; font-size: 12px; }
+
+        /* === UPLOAD AREA === */
+        .upload-zone { border: 2px dashed #E0DFE2; border-radius: 8px; padding: 48px; text-align: center; background: #FAFAFA; margin-bottom: 16px; cursor: pointer; transition: border-color 0.2s; }
+        .upload-zone:hover { border-color: #963BDE; }
+        .upload-zone p { color: #524F5E; font-size: 12px; margin-bottom: 12px; }
+        .upload-zone .browse-btn { background: #0A0A0A; color: #fff; padding: 4px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; border: none; cursor: pointer; }
+
+        /* === TEMPLATE BOX === */
+        .template-box { border: 1px solid #E0DFE2; border-radius: 8px; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; background: #F7F6F9; }
+        .template-box .left h4 { font-size: 12px; font-weight: 700; }
+        .template-box .left p { font-size: 12px; color: #524F5E; }
+        .template-box .btn { font-size: 12px; padding: 6px 14px; }
+
+        /* === FILE CARD === */
+        .file-card { border: 1px solid #E0DFE2; border-radius: 8px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; position: relative; overflow: hidden; }
+        .file-card.success { border-color: #518A3E; background: #F9FFF7; }
+        .file-card.error { border-color: #AF3E3A; background: #FFF5F5; }
+        .file-card .name { font-size: 14px; font-weight: 500; }
+        .file-card .icons { display: flex; gap: 8px; align-items: center; }
+        .file-card .icon-btn { width: 24px; height: 24px; border: none; background: none; cursor: pointer; font-size: 16px; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+        .file-card .icon-btn:hover { background: rgba(0,0,0,0.05); }
+        .file-card .progress-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 4px; }
+        .file-card.success .progress-bar { background: #518A3E; }
+        .file-card.error .progress-bar { background: #AF3E3A; }
+
+        /* === ERROR MESSAGE === */
+        .error-msg { background: #FFF5F5; border: 1px solid #FECACA; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; }
+        .error-msg h4 { font-size: 12px; font-weight: 700; color: #AF3E3A; margin-bottom: 4px; }
+        .error-msg p { font-size: 12px; color: #524F5E; }
+        .error-msg a { color: #AF3E3A; text-decoration: underline; font-weight: 600; cursor: pointer; }
+        .error-msg .actions { display: flex; gap: 8px; margin-top: 8px; }
+
+        /* === SUCCESS MSG === */
+        .success-msg { color: #518A3E; font-size: 12px; font-weight: 500; }
+
+        /* === TARGET SETUP === */
+        .target-section { border: 1px solid #963BDE; border-radius: 8px; padding: 24px 32px; margin-bottom: 24px; background: #fff; }
+        .target-section h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+        .radio-group { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+        .radio-item { padding: 8px 16px; border: 1px solid #E0DFE2; border-radius: 8px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px; min-width: 100px; transition: all 0.15s; }
+        .radio-item:hover { border-color: #963BDE; }
+        .radio-item.selected { border-color: #963BDE; background: #F8F0FF; }
+        .radio-item .dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #9997A0; position: relative; }
+        .radio-item.selected .dot { border-color: #963BDE; }
+        .radio-item.selected .dot::after { content: ''; width: 8px; height: 8px; background: #963BDE; border-radius: 50%; position: absolute; top: 2px; left: 2px; }
+        .info-msg { font-size: 12px; color: #1D4ED8; margin-top: -12px; margin-bottom: 16px; padding-left: 4px; }
+        .info-msg::before { content: 'ℹ️ '; }
+
+        /* === GAMES TABLE === */
+        .games-table-section { margin-top: 24px; }
+        .games-table-section h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .games-table-section p { font-size: 12px; color: #524F5E; margin-bottom: 12px; }
+        .games-table { width: 100%; border-collapse: collapse; border: 1px solid #E0DFE2; border-radius: 8px; overflow: hidden; background: #fff; }
+        .games-table th { background: #F7F6F9; padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 1px solid #E0DFE2; }
+        .games-table td { padding: 12px 16px; font-size: 12px; color: #524F5E; border-bottom: 1px solid #F4F4F4; }
+        .games-table tr:last-child td { border-bottom: none; }
+
+        /* === MODALS === */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(1px); }
+        .modal-overlay.active { display: flex; }
+        .modal { background: #FAFAFA; border-radius: 8px; padding: 32px; max-width: 520px; width: 90%; position: relative; }
+        .modal-close { position: absolute; top: 16px; right: 16px; width: 24px; height: 24px; border: none; background: none; font-size: 18px; cursor: pointer; color: #666; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .modal-close:hover { background: #eee; }
+        .modal h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+        .modal p { font-size: 12px; color: #524F5E; line-height: 1.5; margin-bottom: 16px; }
+        .modal .btn-row { display: flex; gap: 8px; justify-content: stretch; }
+        .modal .btn-row .btn { flex: 1; justify-content: center; }
+
+        /* === FILE PICKER MODAL === */
+        .file-picker { background: #1a1a2e; border-radius: 12px; padding: 20px; max-width: 560px; width: 90%; }
+        .file-picker h4 { color: #fff; font-size: 14px; margin-bottom: 16px; }
+        .file-picker .files { display: flex; flex-direction: column; gap: 8px; }
+        .file-picker .file-item { padding: 12px 16px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: background 0.15s; }
+        .file-picker .file-item:hover { background: rgba(255,255,255,0.1); }
+        .file-picker .file-item .file-icon { width: 32px; height: 32px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; }
+        .file-picker .file-item .file-icon.green { background: #518A3E; }
+        .file-picker .file-item .file-icon.red { background: #AF3E3A; }
+        .file-picker .file-item .file-name { color: #fff; font-size: 13px; }
+        .file-picker .file-item .file-desc { color: #9997A0; font-size: 11px; }
+        .file-picker .picker-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .file-picker .picker-actions .btn { font-size: 12px; padding: 6px 16px; }
+
+        /* === ERROR REPORT MODAL === */
+        .error-list { max-height: 300px; overflow-y: auto; margin-bottom: 16px; }
+        .error-list .error-item { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px solid #F4F4F4; font-size: 12px; color: #524F5E; }
+        .error-list .error-item .err-icon { color: #AF3E3A; font-size: 14px; flex-shrink: 0; }
+        .error-report-header { margin-bottom: 4px; }
+        .error-report-header h3 { margin-bottom: 2px; }
+        .error-report-header p { color: #9997A0; font-size: 11px; margin-bottom: 12px; }
+
+        /* === SUCCESS POPUP === */
+        .success-popup .icon { width: 48px; height: 48px; background: #963BDE; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+        .success-popup .icon.green { background: #22C55E; }
+        .success-popup .workflow-id { background: #ECEAEE; border: 1px solid #E0DFE2; border-radius: 4px; padding: 8px 16px; display: inline-flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 16px; }
+        .success-popup .workflow-id span { font-weight: 600; }
+        .success-popup .workflow-id .copy-btn { cursor: pointer; opacity: 0.6; }
+        .success-popup .workflow-id .copy-btn:hover { opacity: 1; }
+
+        /* === TOOLTIP === */
+        .tooltip-wrapper { position: relative; display: inline-block; }
+        .tooltip { position: absolute; bottom: calc(100% + 8px); right: 0; background: #333; color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 11px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 50; }
+        .tooltip::after { content: ''; position: absolute; top: 100%; right: 16px; border: 6px solid transparent; border-top-color: #333; }
+        .tooltip-wrapper:hover .tooltip { opacity: 1; }
+
+        /* === COMMENT FIELD === */
+        .comment-field { width: 100%; min-height: 100px; border: 1px solid #E0DFE2; border-radius: 8px; padding: 12px 16px; font-family: 'Poppins', sans-serif; font-size: 12px; resize: none; outline: none; background: #F7F6F9; }
+        .comment-field:focus { border-color: #963BDE; }
+        .comment-hint { font-size: 11px; color: #9997A0; margin-top: 4px; }
+        .comment-label { font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+
+        /* === UTILITIES === */
+        .hidden { display: none !important; }
+        .mt-8 { margin-top: 8px; }
+        .mt-16 { margin-top: 16px; }
+        .text-center { text-align: center; }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-logo">
+            <div class="icon">🎮</div>
+            <div class="text">
+                <div class="title">Game Console</div>
+                <div class="sub">Management Portal</div>
+            </div>
+        </div>
+        <div class="header-nav">
+            <a href="#" class="active">Game Actions</a>
+            <a href="#">Workflow Tracker</a>
+            <a href="#">Game Catalog</a>
+            <a href="#">Reports</a>
+        </div>
+        <div class="header-right">
+            <span class="bell">🔔</span>
+            <div class="avatar"></div>
+        </div>
+    </div>
+
+    <!-- === SCREEN: GAME ACTIONS === -->
+    <div id="screen-actions" class="screen">
+        <div class="content" style="display:flex; align-items:center; justify-content:center; min-height: calc(100vh - 60px);">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; max-width:700px; width:100%;">
+                <div class="action-card" onclick="goToStep1()" style="background:#ECEAEE; border:1px solid #E0DFE2; border-radius:16px; padding:32px; cursor:pointer; transition: transform 0.1s;">
+                    <div style="font-size:24px; margin-bottom:8px;">💬</div>
+                    <h3 style="font-size:16px; font-weight:700; margin-bottom:4px;">Add Games</h3>
+                    <p style="font-size:12px; color:#524F5E; max-width:188px;">Quickly add new games to the platform with key details.</p>
+                </div>
+                <div class="action-card" style="background:#ECEAEE; border:1px solid #E0DFE2; border-radius:16px; padding:32px; opacity:0.6; cursor:not-allowed;">
+                    <div style="font-size:24px; margin-bottom:8px;">✏️</div>
+                    <h3 style="font-size:16px; font-weight:700; margin-bottom:4px;">Edit Games</h3>
+                    <p style="font-size:12px; color:#524F5E; max-width:188px;">Modify game attributes & descriptions with ease.</p>
+                </div>
+                <div class="action-card" style="background:#ECEAEE; border:1px solid #E0DFE2; border-radius:16px; padding:32px; opacity:0.6; cursor:not-allowed;">
+                    <div style="font-size:24px; margin-bottom:8px;">📤</div>
+                    <h3 style="font-size:16px; font-weight:700; margin-bottom:4px;">Publish Games</h3>
+                    <p style="font-size:12px; color:#524F5E; max-width:188px;">Make your games available to players across all regions.</p>
+                </div>
+                <div class="action-card" style="background:#ECEAEE; border:1px solid #E0DFE2; border-radius:16px; padding:32px; opacity:0.6; cursor:not-allowed;">
+                    <div style="font-size:24px; margin-bottom:8px;">🖥️</div>
+                    <h3 style="font-size:16px; font-weight:700; margin-bottom:4px;">Enable/Disable Games</h3>
+                    <p style="font-size:12px; color:#524F5E; max-width:188px;">Manage game availability by enabling or disabling access.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- === SCREEN: ADD GAMES FLOW === -->
+    <div id="screen-addgames" class="screen hidden">
+        <div class="sub-header">
+            <button class="back-btn" onclick="showModal('modal-discard-main')">← Back</button>
+            <span class="page-title">Add Games</span>
+        </div>
+        <div class="content">
+            <p class="page-desc">Create a new game entry with all required details</p>
+
+            <!-- Stepper -->
+            <div class="stepper">
+                <div class="step active" id="step-ind-1"><div class="step-bar"></div><div class="step-label"><span class="step-number">1</span> Upload Games</div></div>
+                <div class="step" id="step-ind-2"><div class="step-bar"></div><div class="step-label"><span class="step-number">2</span> Upload Meta Data</div></div>
+                <div class="step" id="step-ind-3"><div class="step-bar"></div><div class="step-label"><span class="step-number">3</span> Target Setup</div></div>
+            </div>
+
+            <!-- STEP 1: Upload Games -->
+            <div id="step-1" class="step-content">
+                <div class="step-header">
+                    <div class="step-header-left">
+                        <h2>Upload Games Data Sheet</h2>
+                        <p>Upload a completed 'Add Games' spreadsheet to streamline the process. Ensure the file adheres to the provided template for successful upload.</p>
+                    </div>
+                    <div class="step-header-right">
+                        <div class="tooltip-wrapper">
+                            <button class="btn btn-primary disabled" id="btn-next-1" onclick="goToStep(2)">Next</button>
+                            <div class="tooltip" id="tooltip-1">Upload your finished 'Add Games' spreadsheet to proceed to the next step.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="upload-area-1">
+                    <div class="upload-zone" onclick="showModal('modal-filepicker-1')">
+                        <p style="font-weight:600;">Upload the games data as per the standard template spreadsheet.</p>
+                        <p>Drag & drop the file here</p>
+                        <button class="browse-btn" onclick="event.stopPropagation(); showModal('modal-filepicker-1')">Browse files</button>
+                    </div>
+                    <div class="template-box">
+                        <div class="left">
+                            <h4>Need the spreadsheet template?</h4>
+                            <p>Your file must match the standard Add Games format — download the template to get started.</p>
+                        </div>
+                        <button class="btn btn-secondary btn-sm">⬇ Download Template</button>
+                    </div>
+                </div>
+
+                <!-- File uploaded states -->
+                <div id="file-success-1" class="hidden">
+                    <div class="file-card success">
+                        <span class="name">Add_New_Games_File.xlsx</span>
+                        <div class="icons">
+                            <span style="color:#518A3E; font-size:18px;">✓</span>
+                            <button class="icon-btn" onclick="deleteFile(1)">🗑️</button>
+                        </div>
+                        <div class="progress-bar"></div>
+                    </div>
+                    <p class="success-msg">File uploaded successfully</p>
+                </div>
+
+                <div id="file-error-1" class="hidden">
+                    <div class="file-card error">
+                        <span class="name">Add_New_Games_File.xlsx</span>
+                        <div class="icons">
+                            <span style="color:#AF3E3A; font-size:18px;">⚠</span>
+                            <button class="icon-btn" onclick="deleteFile(1)">🗑️</button>
+                        </div>
+                        <div class="progress-bar"></div>
+                    </div>
+                    <div class="error-msg">
+                        <h4>⚠ Errors in the uploaded file</h4>
+                        <p>The Excel sheet you uploaded has <a onclick="showModal('modal-error-report')">errors</a>. Please correct the data and upload a new file to proceed.</p>
+                        <div class="actions">
+                            <button class="btn btn-secondary btn-sm" onclick="showModal('modal-error-report')">Download Error Report</button>
+                            <button class="btn btn-secondary btn-sm" onclick="deleteFile(1)">Upload Another File</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 2: Upload Meta Data -->
+            <div id="step-2" class="step-content hidden">
+                <div class="step-header">
+                    <div class="step-header-left">
+                        <button class="step-back-btn" onclick="showModal('modal-discard-step')">←</button>
+                        <div>
+                            <h2>Upload Meta Data</h2>
+                            <p>Upload a completed 'Games Metadata' spreadsheet. Ensure the file adheres to the template for successful upload.</p>
+                        </div>
+                    </div>
+                    <div class="step-header-right">
+                        <div class="tooltip-wrapper">
+                            <button class="btn btn-primary disabled" id="btn-next-2" onclick="goToStep(3)">Next</button>
+                            <div class="tooltip" id="tooltip-2">Upload your finished 'Games Metadata' spreadsheet to proceed to the next step.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="upload-area-2">
+                    <div class="upload-zone" onclick="showModal('modal-filepicker-2')">
+                        <p style="font-weight:600;">Upload the games data as per the standard template spreadsheet.</p>
+                        <p>Drag & drop the file here</p>
+                        <button class="browse-btn" onclick="event.stopPropagation(); showModal('modal-filepicker-2')">Browse files</button>
+                    </div>
+                    <div class="template-box">
+                        <div class="left">
+                            <h4>Need the spreadsheet template?</h4>
+                            <p>Your file must match the standard 'Games Metadata' format — download the template to get started.</p>
+                        </div>
+                        <button class="btn btn-secondary btn-sm">⬇ Download Template</button>
+                    </div>
+                </div>
+
+                <div id="file-success-2" class="hidden">
+                    <div class="file-card success">
+                        <span class="name">Games_Metadata_File.xlsx</span>
+                        <div class="icons">
+                            <span style="color:#518A3E; font-size:18px;">✓</span>
+                            <button class="icon-btn" onclick="deleteFile(2)">🗑️</button>
+                        </div>
+                        <div class="progress-bar"></div>
+                    </div>
+                    <p class="success-msg">File uploaded successfully</p>
+                </div>
+
+                <div id="file-error-2" class="hidden">
+                    <div class="file-card error">
+                        <span class="name">Games_Metadata_File.xlsx</span>
+                        <div class="icons">
+                            <span style="color:#AF3E3A; font-size:18px;">⚠</span>
+                            <button class="icon-btn" onclick="deleteFile(2)">🗑️</button>
+                        </div>
+                        <div class="progress-bar"></div>
+                    </div>
+                    <div class="error-msg">
+                        <h4>⚠ Errors in the uploaded file</h4>
+                        <p>The Excel sheet you uploaded has <a onclick="showModal('modal-error-report')">errors</a>. Please correct the data and upload a new file to proceed.</p>
+                        <div class="actions">
+                            <button class="btn btn-secondary btn-sm" onclick="showModal('modal-error-report')">Download Error Report</button>
+                            <button class="btn btn-secondary btn-sm" onclick="deleteFile(2)">Upload Another File</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 3: Target Setup -->
+            <div id="step-3" class="step-content hidden">
+                <div class="step-header">
+                    <div class="step-header-left">
+                        <button class="step-back-btn" onclick="showModal('modal-discard-step')">←</button>
+                        <div>
+                            <h2>Select Target Setup</h2>
+                            <p>To add games successfully, select the data centre and environment where the games will be published.</p>
+                        </div>
+                    </div>
+                    <div class="step-header-right">
+                        <button class="btn btn-secondary" onclick="showModal('modal-save-draft')">Save as Draft</button>
+                        <button class="btn btn-primary" id="btn-submit" onclick="handleSubmit()">Submit</button>
+                    </div>
+                </div>
+
+                <div class="target-section">
+                    <h3>Data Centres</h3>
+                    <div class="radio-group" id="dc-group">
+                        <div class="radio-item" onclick="selectRadio(this, 'dc')"><span class="dot"></span>ROW</div>
+                        <div class="radio-item" onclick="selectRadio(this, 'dc')"><span class="dot"></span>USNJ</div>
+                        <div class="radio-item" onclick="selectRadio(this, 'dc')"><span class="dot"></span>USMI</div>
+                        <div class="radio-item" onclick="selectRadio(this, 'dc')"><span class="dot"></span>USWV</div>
+                        <div class="radio-item" onclick="selectRadio(this, 'dc')"><span class="dot"></span>USPA</div>
+                        <div class="radio-item" onclick="selectRadio(this, 'dc')"><span class="dot"></span>UDC</div>
+                    </div>
+
+                    <h3>Environments <span style="opacity:0.5; font-size:12px;">ℹ</span></h3>
+                    <div class="radio-group" id="env-group">
+                        <div class="radio-item" onclick="selectRadio(this, 'env')"><span class="dot"></span>QA2</div>
+                        <div class="radio-item" onclick="selectRadio(this, 'env')"><span class="dot"></span>QA3</div>
+                        <div class="radio-item" onclick="selectRadio(this, 'env')"><span class="dot"></span>QA4</div>
+                        <div class="radio-item" onclick="selectRadio(this, 'env')"><span class="dot"></span>QA51</div>
+                        <div class="radio-item" data-env="staging" onclick="selectRadio(this, 'env')"><span class="dot"></span>Staging</div>
+                        <div class="radio-item" data-env="production" onclick="selectRadio(this, 'env')"><span class="dot"></span>Production</div>
+                    </div>
+                    <p class="info-msg hidden" id="approval-msg">This will require approval</p>
+                </div>
+
+                <div class="games-table-section">
+                    <h4>25 games uploaded from spreadsheet</h4>
+                    <p>Below games will be added to the system</p>
+                    <table class="games-table">
+                        <thead><tr><th>Game ID</th><th>Game Name</th><th>Supplier</th><th>Sub-Supplier</th><th>Game Type</th></tr></thead>
+                        <tbody>
+                            <tr><td>YU7654</td><td>Lucky Sevens</td><td>Pluto Games</td><td>Pluto Games</td><td>Casino</td></tr>
+                            <tr><td>KJ8765</td><td>Neon Reels</td><td>Nairobi Inc</td><td>Nairobi Inc</td><td>Slots</td></tr>
+                            <tr><td>GT9876</td><td>Triple Diamonds</td><td>Vegas Studios</td><td>Vegas Studios</td><td>Blackjack</td></tr>
+                            <tr><td>FR2345</td><td>Golden Cherries</td><td>Okapi Systems</td><td>Okapi Systems</td><td>Bingo</td></tr>
+                            <tr><td>DE3456</td><td>Blazing Bells</td><td>Level Up Games</td><td>Level Up Games</td><td>Poker</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- === MODALS === -->
+
+    <!-- Discard Main (Back to Game Actions) -->
+    <div class="modal-overlay" id="modal-discard-main">
+        <div class="modal">
+            <button class="modal-close" onclick="hideModal('modal-discard-main')">✕</button>
+            <h3>Discard progress?</h3>
+            <p>If you go back to the Game Actions now your progress will be discarded. Are you sure you want to go back?</p>
+            <div class="btn-row">
+                <button class="btn btn-secondary" onclick="hideModal('modal-discard-main')">Cancel</button>
+                <button class="btn btn-primary" onclick="hideModal('modal-discard-main'); goToActions()">Go Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Discard Step (step-level back) -->
+    <div class="modal-overlay" id="modal-discard-step">
+        <div class="modal">
+            <button class="modal-close" onclick="hideModal('modal-discard-step')">✕</button>
+            <h3>Discard progress?</h3>
+            <p>Your progress on the current step will be discarded if you go back to the previous step. Are you sure?</p>
+            <div class="btn-row">
+                <button class="btn btn-secondary" onclick="hideModal('modal-discard-step')">Cancel</button>
+                <button class="btn btn-primary" onclick="hideModal('modal-discard-step'); goToPrevStep()">Go Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Picker 1 -->
+    <div class="modal-overlay" id="modal-filepicker-1">
+        <div class="modal file-picker">
+            <h4>Choose a file to upload</h4>
+            <div class="files">
+                <div class="file-item" onclick="pickFile(1, 'success')">
+                    <div class="file-icon green">XLS</div>
+                    <div><div class="file-name">Add_New_Games_File.xlsx</div><div class="file-desc">Valid file — will upload successfully</div></div>
+                </div>
+                <div class="file-item" onclick="pickFile(1, 'error')">
+                    <div class="file-icon red">XLS</div>
+                    <div><div class="file-name">Add_New_Games_File.xlsx</div><div class="file-desc">Contains errors — will fail validation</div></div>
+                </div>
+            </div>
+            <div class="picker-actions">
+                <button class="btn btn-secondary" style="color:#fff; border-color:rgba(255,255,255,0.3);" onclick="hideModal('modal-filepicker-1')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Picker 2 -->
+    <div class="modal-overlay" id="modal-filepicker-2">
+        <div class="modal file-picker">
+            <h4>Choose a file to upload</h4>
+            <div class="files">
+                <div class="file-item" onclick="pickFile(2, 'success')">
+                    <div class="file-icon green">XLS</div>
+                    <div><div class="file-name">Games_Metadata_File.xlsx</div><div class="file-desc">Valid file — will upload successfully</div></div>
+                </div>
+                <div class="file-item" onclick="pickFile(2, 'error')">
+                    <div class="file-icon red">XLS</div>
+                    <div><div class="file-name">Games_Metadata_File.xlsx</div><div class="file-desc">Contains errors — will fail validation</div></div>
+                </div>
+            </div>
+            <div class="picker-actions">
+                <button class="btn btn-secondary" style="color:#fff; border-color:rgba(255,255,255,0.3);" onclick="hideModal('modal-filepicker-2')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Report Modal -->
+    <div class="modal-overlay" id="modal-error-report">
+        <div class="modal">
+            <button class="modal-close" onclick="hideModal('modal-error-report')">✕</button>
+            <div class="error-report-header">
+                <h3>Error Report</h3>
+                <p>14 errors found in Add_New_Games_File.xlsx</p>
+            </div>
+            <div class="error-list">
+                <div class="error-item"><span class="err-icon">⊘</span> Cell D13 — Cell is missing a value</div>
+                <div class="error-item"><span class="err-icon">⊘</span> Cell A2 — Only numeric values are allowed</div>
+                <div class="error-item"><span class="err-icon">⊘</span> Cell B5 — Invalid date format. Expected MM/DD/YYYY</div>
+                <div class="error-item"><span class="err-icon">⊘</span> Cell C8 — Value exceeds maximum character limit (255)</div>
+                <div class="error-item"><span class="err-icon">⊘</span> Cell E11 — Duplicate entry found</div>
+                <div class="error-item"><span class="err-icon">⊘</span> Cell F3 — Invalid category. Must match predefined list</div>
+                <div class="error-item"><span class="err-icon">⊘</span> Cell G7 — Required field cannot be empty</div>
+                <div class="error-item"><span class="err-icon">⊘</span> Cell H15 — Value must be a positive integer</div>
+                <div class="error-item"><span class="err-icon">⊘</span> Cell I4 — URL format is invalid</div>
+                <div class="error-item"><span class="err-icon">⊘</span> Cell J9 — Rating must be between 1 and 10</div>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-secondary" onclick="hideModal('modal-error-report')">Cancel</button>
+                <button class="btn btn-primary">Download Report</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save as Draft Confirm -->
+    <div class="modal-overlay" id="modal-save-draft">
+        <div class="modal">
+            <button class="modal-close" onclick="hideModal('modal-save-draft')">✕</button>
+            <h3>Save to drafts?</h3>
+            <p>Your progress will be saved as a draft. You can resume from the Workflow Tracker.</p>
+            <div class="btn-row">
+                <button class="btn btn-secondary" onclick="hideModal('modal-save-draft')">Cancel</button>
+                <button class="btn btn-primary" onclick="hideModal('modal-save-draft'); showModal('modal-draft-success')">Save as Draft</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Draft Saved Success -->
+    <div class="modal-overlay" id="modal-draft-success">
+        <div class="modal success-popup text-center">
+            <button class="modal-close" onclick="hideModal('modal-draft-success')">✕</button>
+            <div class="icon" style="margin:0 auto 12px;">📁</div>
+            <h3>Workflow saved as draft</h3>
+            <p>Your progress has been saved as a draft. You can resume using the following workflow ID</p>
+            <div class="workflow-id"><span>Workflow ID:</span> 83264739 <span class="copy-btn" onclick="navigator.clipboard.writeText('83264739')">📋</span></div>
+            <div class="btn-row">
+                <button class="btn btn-secondary" onclick="hideModal('modal-draft-success'); goToActions()">Go To Workflow Tracker</button>
+                <button class="btn btn-secondary" onclick="hideModal('modal-draft-success'); goToActions()">Add More Games</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit Confirmation (Production/Staging) -->
+    <div class="modal-overlay" id="modal-submit-confirm">
+        <div class="modal">
+            <button class="modal-close" onclick="hideModal('modal-submit-confirm')">✕</button>
+            <h3>Submit games to production?</h3>
+            <p>You are requesting to add <strong>25 games</strong> in the <strong id="submit-target">ROW – Production</strong>. An approval request will be sent to the administrator. Do you want to continue?</p>
+            <div class="comment-label">Add a comment for the reviewer*</div>
+            <textarea class="comment-field" placeholder="Write your comment here"></textarea>
+            <div class="comment-hint">Your reviewer will see this comment</div>
+            <div class="btn-row mt-16">
+                <button class="btn btn-secondary" onclick="hideModal('modal-submit-confirm')">Cancel</button>
+                <button class="btn btn-primary" onclick="hideModal('modal-submit-confirm'); showModal('modal-submit-success')">Submit for Approval</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit Success -->
+    <div class="modal-overlay" id="modal-submit-success">
+        <div class="modal success-popup text-center">
+            <button class="modal-close" onclick="hideModal('modal-submit-success')">✕</button>
+            <div class="icon green" style="margin:0 auto 12px; font-size:24px; color:#fff;">✓</div>
+            <h3>Request Submitted Successfully</h3>
+            <p>Your request to <strong>Add New Games</strong> has been successfully sent to the admin. You can track your request with the following workflow ID</p>
+            <div class="workflow-id"><span>Workflow ID:</span> 83264739 <span class="copy-btn" onclick="navigator.clipboard.writeText('83264739')">📋</span></div>
+            <div class="btn-row">
+                <button class="btn btn-secondary" onclick="hideModal('modal-submit-success'); goToActions()">Go To Workflow Tracker</button>
+                <button class="btn btn-secondary" onclick="hideModal('modal-submit-success'); goToActions()">Add More Games</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let selectedDC = null;
+        let selectedEnv = null;
+
+        // Screen navigation
+        function goToActions() {
+            document.getElementById('screen-actions').classList.remove('hidden');
+            document.getElementById('screen-addgames').classList.add('hidden');
+            resetFlow();
+        }
+
+        function goToStep1() {
+            document.getElementById('screen-actions').classList.add('hidden');
+            document.getElementById('screen-addgames').classList.remove('hidden');
+            goToStep(1);
+        }
+
+        // Step navigation
+        function goToStep(step) {
+            currentStep = step;
+            document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('step-' + step).classList.remove('hidden');
+            updateStepper();
+        }
+
+        function goToPrevStep() {
+            if (currentStep > 1) {
+                goToStep(currentStep - 1);
+            }
+        }
+
+        function updateStepper() {
+            for (let i = 1; i <= 3; i++) {
+                const el = document.getElementById('step-ind-' + i);
+                el.classList.remove('active', 'completed');
+                if (i < currentStep) el.classList.add('completed');
+                if (i === currentStep) el.classList.add('active');
+            }
+        }
+
+        // File handling
+        function pickFile(step, result) {
+            hideModal('modal-filepicker-' + step);
+            const uploadArea = document.getElementById('upload-area-' + step);
+            const successEl = document.getElementById('file-success-' + step);
+            const errorEl = document.getElementById('file-error-' + step);
+            const nextBtn = document.getElementById('btn-next-' + step);
+            const tooltip = document.getElementById('tooltip-' + step);
+
+            uploadArea.classList.add('hidden');
+            if (result === 'success') {
+                successEl.classList.remove('hidden');
+                errorEl.classList.add('hidden');
+                nextBtn.classList.remove('disabled');
+                if (tooltip) tooltip.style.display = 'none';
+            } else {
+                errorEl.classList.remove('hidden');
+                successEl.classList.add('hidden');
+                nextBtn.classList.add('disabled');
+                if (tooltip) tooltip.style.display = '';
+            }
+        }
+
+        function deleteFile(step) {
+            const uploadArea = document.getElementById('upload-area-' + step);
+            const successEl = document.getElementById('file-success-' + step);
+            const errorEl = document.getElementById('file-error-' + step);
+            const nextBtn = document.getElementById('btn-next-' + step);
+            const tooltip = document.getElementById('tooltip-' + step);
+
+            uploadArea.classList.remove('hidden');
+            successEl.classList.add('hidden');
+            errorEl.classList.add('hidden');
+            nextBtn.classList.add('disabled');
+            if (tooltip) tooltip.style.display = '';
+        }
+
+        // Radio selection
+        function selectRadio(el, group) {
+            const parent = el.parentElement;
+            parent.querySelectorAll('.radio-item').forEach(item => item.classList.remove('selected'));
+            el.classList.add('selected');
+
+            if (group === 'dc') {
+                selectedDC = el.textContent.trim();
+            } else {
+                selectedEnv = el.textContent.trim();
+                const approvalMsg = document.getElementById('approval-msg');
+                const envData = el.getAttribute('data-env');
+                if (envData === 'staging' || envData === 'production') {
+                    approvalMsg.classList.remove('hidden');
+                } else {
+                    approvalMsg.classList.add('hidden');
+                }
+            }
+        }
+
+        // Submit logic
+        function handleSubmit() {
+            const dc = selectedDC || 'ROW';
+            const env = selectedEnv || 'QA2';
+            document.getElementById('submit-target').textContent = dc + ' – ' + env;
+            showModal('modal-submit-confirm');
+        }
+
+        // Modal management
+        function showModal(id) { document.getElementById(id).classList.add('active'); }
+        function hideModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        // Reset
+        function resetFlow() {
+            currentStep = 1;
+            selectedDC = null;
+            selectedEnv = null;
+            for (let i = 1; i <= 2; i++) { deleteFile(i); }
+            document.querySelectorAll('.radio-item').forEach(el => el.classList.remove('selected'));
+            document.getElementById('approval-msg').classList.add('hidden');
+            goToStep(1);
+        }
+
+        // Close modals on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) overlay.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>
